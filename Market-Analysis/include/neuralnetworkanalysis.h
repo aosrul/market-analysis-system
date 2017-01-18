@@ -5,10 +5,6 @@
 #include "include/settingsstruct.h"
 #include "include/imt4reader.h"
 
-// include opennn library
-#include "../opennn/opennn.h"
-using namespace OpenNN;
-
 class NeuralNetworkAnalysis : public QObject
 {
     Q_OBJECT
@@ -18,15 +14,8 @@ public:
 
 private:
     ConfigMT4                       *config;
-    qint32                          rowsDS = 1;
-    qint32                          columnsDS = 0;
     qint64                          firstEntryTime;
     qint64                          lastEntryTime;
-    Matrix<double>                  *matrixDS;
-    DataSet                         *dataSet;
-    NeuralNetwork                   *neuralNetwork;
-    PerformanceFunctional           *performanceFunc;
-    TrainingStrategy                *trainingStrategy;
 
 public slots:
     void setConfigKit(ConfigMT4 *cfg);
