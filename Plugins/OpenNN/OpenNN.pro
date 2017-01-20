@@ -11,17 +11,18 @@
 #                                                                             #
 ###############################################################################
 
-QT       -= gui
+QT          -= gui
+TEMPLATE     = lib
+CONFIG      += plugin
+TARGET       = $$qtLibraryTarget(nn_OpenNN)
+DESTDIR      = ../../Plugins
+DEFINES     += OPENNN_PLUGIN
 
-TARGET = OpenNN
-TEMPLATE = lib
+INCLUDEPATH += ../../Market-Analysis/include
 
-DEFINES += OPENNN_PLUGIN
+HEADERS     += nn_opennn.h
 
-SOURCES += opennn.cpp
-
-HEADERS += ../global_headers/neuralnetwork_global.h \
-        opennn.h
+SOURCES     += nn_opennn.cpp
 
 win32-g++{
     QMAKE_LFLAGS += -static-libgcc
@@ -30,8 +31,8 @@ win32-g++{
 }
 
 unix{
-target.path = /usr/lib
-INSTALLS += target
+    target.path = /usr/lib
+    INSTALLS += target
 }
 
 # OpenNN library

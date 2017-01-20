@@ -17,9 +17,7 @@ TEMPLATE = subdirs
 
 CONFIG += ordered
 
-CONFIG(release, debug|release) {
-#DEFINES += NDEBUG
-}
-
 SUBDIRS += Market-Analysis
 SUBDIRS += Plugins
+
+app.depends = plugins

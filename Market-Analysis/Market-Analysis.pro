@@ -16,9 +16,8 @@ QT      += core gui
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = MarketAnalysisSystem
+DESTDIR = ..
 TEMPLATE = app
-
-INCLUDEPATH += $$PWD/../Plugins/global_headers/
 
 RESOURCES += Market-Analysis.qrc
 
@@ -49,12 +48,20 @@ HEADERS += include/mainwindow.h \
         include/imt4reader.h \
         include/hstreader.h \
         include/csvreader.h \
-        include/csvwriter.h
+        include/csvwriter.h \
+        include/interfaces_global.h
 
 FORMS += mainwindow.ui \
         settingsform.ui \
         kitconfigform.ui \
         openkitdialog.ui
+
+LIBS =  -L../Plugins
+
+if(!debug_and_release|build_pass):CONFIG(debug, debug|release) {
+    win32:LIBS = $$member(LIBS, 0)d #$$member(LIBS, 1)d
+    mac:LIBS = $$member(LIBS, 0)_debug #$$member(LIBS, 1)_debug
+}
 
 win32-g++{
     QMAKE_LFLAGS += -static-libgcc

@@ -3,20 +3,35 @@
 
 #include <QObject>
 #include <QDateTime>
+#include "include/interfaces_global.h"
 
 struct Settings {
+    Settings();
+    ~Settings();
     qint32          maxOpenTabs = 5;
     QStringList     savedKits;
     QStringList     session;
+    QString         pluginsPath;
+    QList<NN_PluginInterface *>
+                    nnPlugins;
+    QList<OSC_PluginInterface *>
+                    oscPlugins;
+    QList<PP_PluginInterface *>
+                    ppPlugins;
     qint32          winPosX;
     qint32          winPosY;
     qint32          winSizeX;
     qint32          winSizeY;
+//===========Functions==============================
+private:
+    void loadPlugins();
+    void sortPlugin(QObject *obj);
 };
 
 struct ConfigMT4 {
     ConfigMT4(QString name) : nameKit( name ) {
         setPath(); setTrainingMethods(); setSymbolsOfTime();
+        nnPluginName = "OpenNN";
     }
     ~ConfigMT4() { }
     QString         nameKit;
@@ -28,11 +43,12 @@ struct ConfigMT4 {
     QStringList     symbols;
     QStringList     symbolsOfTime;
     QStringList     trainingMethods;
+    QString         nnPluginName;
     QString         historyPath = "/history/"; // default ?
-    const QString   configFile = "/MQL4/Files/mas_mt4.conf";
-    const QString   newHistoryPath = "/MQL4/Files/MAS_MarketData/h";
-    const QString   predictionPath = "/MQL4/Files/MAS_Prediction/p";
-    // Model parameters
+    const QString   configFile = "/MQL4/Files/mas.conf";
+    const QString   newHistoryPath = "/MQL4/Files/MAS_MarketData/";
+    const QString   predictionPath = "/MQL4/Files/MAS_Prediction/";
+//== Model parameters
     QList<qint32>   periods;
     QStringList     input;
     QStringList     output;

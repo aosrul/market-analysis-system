@@ -1,6 +1,62 @@
 #include "include/settingsstruct.h"
 #include <QApplication>
 #include <QDir>
+#include <QPluginLoader>
+
+Settings::Settings()
+{
+    QString mDir = qApp->applicationDirPath();
+    pluginsPath = mDir + "/Plugins";
+    loadPlugins();
+}
+
+Settings::~Settings()
+{
+    foreach( NN_PluginInterface *obj, nnPlugins )
+        delete obj;
+    foreach( OSC_PluginInterface *obj, oscPlugins )
+        delete obj;
+    foreach( PP_PluginInterface *obj, ppPlugins )
+        delete obj;
+}
+
+void Settings::loadPlugins()
+{
+#ifdef Q_OS_WIN32
+    QStringList filter;
+    filter << "*.dll";
+#endif
+#ifdef Q_OS_LINUX
+    QStringList filter;
+    filter << "*.so";
+#endif
+    QDir pluginsDir( pluginsPath );
+    foreach( QString file, pluginsDir.entryList( filter, QDir::Files ) ) {
+        QPluginLoader loader( pluginsDir.absoluteFilePath(file) );
+        QObject *plugin = loader.instance();
+        if( plugin ) {
+            sortPlugin( plugin );
+        }
+    }
+}
+
+void Settings::sortPlugin(QObject *obj)
+{
+    NN_PluginInterface *nn_plugin = qobject_cast<NN_PluginInterface *>(obj);
+    if( nn_plugin ) {
+        nnPlugins.append( nn_plugin );
+    }
+    OSC_PluginInterface *osc_plugin = qobject_cast<OSC_PluginInterface *>(obj);
+    if( osc_plugin ) {
+        oscPlugins.append( osc_plugin );
+    }
+    PP_PluginInterface *pp_plugin = qobject_cast<PP_PluginInterface *>(obj);
+    if( pp_plugin ) {
+        ppPlugins.append( pp_plugin );
+    }
+}
+
+//===============ConfigMT4================
 
 void ConfigMT4::rename(const QString newName) {
     if( nameKit != newName ) {
@@ -66,7 +122,7 @@ qint32 ConfigMT4::sumOutput()
 }
 
 void ConfigMT4::setPath() {
-    QString mDir = QApplication::applicationDirPath();
+    QString mDir = qApp->applicationDirPath();
     mDir += "/Market Kits/";
     mDir += nameKit;
     if( !QDir().exists(mDir) )
@@ -75,7 +131,7 @@ void ConfigMT4::setPath() {
 }
 
 void ConfigMT4::renamePath(const QString newName) {
-    QString mDir2 = QApplication::applicationDirPath();
+    QString mDir2 = qApp->applicationDirPath();
     mDir2 += "/Market Kits/";
     mDir2 += newName;
     if( !QDir().exists(kitPath) )
@@ -103,17 +159,8 @@ void ConfigMT4::setServer() {
 }
 
 void ConfigMT4::setSymbols() {
-    symbols.clear();
+    //symbols.clear();
     // read mas_mt4.conf
-    symbols.append("EURUSD.pro");
-    symbols.append("GBPUSD.pro");
-    symbols.append("USDJPY.pro");
-    symbols.append("AUDUSD.pro");
-    symbols.append("S&P500");
-    symbols.append("DAX");
-    symbols.append("FTSE100");
-    symbols.append("BRENT");
-    symbols.append("XAUUSD.pro");
 }
 
 void ConfigMT4::setSymbolsOfTime() {

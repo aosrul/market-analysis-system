@@ -10,7 +10,9 @@ class MarketAssayKit : public QObject
 {
     Q_OBJECT
 public:
-    explicit MarketAssayKit(QObject *parent = 0, ConfigMT4 *cfg = 0);
+    explicit MarketAssayKit(QObject *parent = 0,
+                            ConfigMT4 *cfg = 0,
+                            Settings *sett = 0);
     ~MarketAssayKit();
 
 private:

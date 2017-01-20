@@ -1,11 +1,12 @@
 #include "include/marketassaykit.h"
 
-MarketAssayKit::MarketAssayKit(QObject *parent, ConfigMT4 *cfg) :
+MarketAssayKit::MarketAssayKit(QObject *parent, ConfigMT4 *cfg, Settings *sett) :
     QObject(parent),
     config(cfg)
 {
     setConnections();
     ma_nnWorker.setConfigKit( cfg );
+    ma_nnWorker.setSettings( sett );
     ma_nnWorker.moveToThread(&maThread);
     maThread.start();
 }
@@ -21,7 +22,7 @@ void MarketAssayKit::setConnections()
     connect( this, SIGNAL( runTraining() ), &ma_nnWorker, SLOT( runTraining() ) );
     connect( this, SIGNAL( runPrediction() ), &ma_nnWorker, SLOT( runPrediction() ) );
     connect( this, SIGNAL( stop() ), &ma_nnWorker, SLOT( stop() ) );
-    connect( &ma_nnWorker, SIGNAL( trained() ), this, SLOT( trained() ) );
+    connect( &ma_nnWorker, SIGNAL( workedOut() ), this, SLOT( trained() ) );
     connect( &ma_nnWorker, SIGNAL( progress(qint32) ), this, SLOT( progress(qint32) ) );
     connect( &ma_nnWorker, SIGNAL( message(QString) ), this, SLOT( message(QString) ) );
     connect( &ma_nnWorker, SIGNAL( pause(qint32) ), this, SLOT( pause(qint32) ) );
