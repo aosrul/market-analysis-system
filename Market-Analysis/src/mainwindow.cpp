@@ -195,6 +195,7 @@ void MainWindow::setConnections()
              this, SLOT( closeTab(qint32) ) );
     connect( ui->vTabWidget, SIGNAL( currentChanged(int) ),
              this, SLOT( setCurrentTab(qint32) ) );
+    connect( ui->actionAbout_Qt, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)

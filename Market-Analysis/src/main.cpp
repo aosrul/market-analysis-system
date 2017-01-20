@@ -5,10 +5,10 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    QApplication::setOrganizationName("Terentew Aleksey");
-    QApplication::setOrganizationDomain("https://www.mql5.com/ru/users/terentjew23");
-    QApplication::setApplicationName("Market Analysis System");
-    QApplication::setApplicationVersion("1.1.3b");
+    qApp->setOrganizationName("Terentew Aleksey");
+    qApp->setOrganizationDomain("https://www.mql5.com/ru/users/terentjew23");
+    qApp->setApplicationName("Market Analysis System");
+    qApp->setApplicationVersion("1.1.4-alpha");
 
     QString mDir = a.applicationDirPath();
     mDir += "/Market Kits";
