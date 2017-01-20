@@ -16,6 +16,7 @@ Presenter::Presenter(QObject *parent) : QObject(parent),
     setConnections();
     loadSettings();
     settingsForm->setSettingsPtr( settings );
+    kitConfigForm->setSettingsPtr( settings );
     foreach( QString kit, settings->session )
         openMAKit( kit );
 }
@@ -46,7 +47,8 @@ void Presenter::openSettingsForm()
 
 void Presenter::openKitConfigForm(const QString name)
 {
-    name;
+    Q_UNUSED(name);
+    //kitConfigForm->setConfigMt4Ptr( mapKits[name]->configKit );
     kitConfigForm->show();
 }
 
@@ -75,13 +77,7 @@ void Presenter::newMAKit(void)
         idx += 1;
         name = tr("New Market Kit (%1)").arg( idx );
     }
-    mapKits[name] = new Trio( this, mainWindow, name );
-    setConnections( name );
-    loadMAKit( name );
-    mainWindow->addNewTab( name, mapKits[name]->tabKit );
-    settings->savedKits.append( name );
-    settings->session.append( name );
-    setCurrentKit( name );
+    openMAKit( name );
 }
 
 void Presenter::openDialog()
@@ -91,11 +87,21 @@ void Presenter::openDialog()
 
 void Presenter::openMAKit(QString name)
 {
-    if( !settings->savedKits.contains( name ) || name == "" )
+    if( name == "" )
         return;
-    mapKits[name] = new Trio( this, mainWindow, name );
+    if( !settings->savedKits.contains(name) && !name.contains("New Market Kit") ) {
+        errorMessage( tr("Open %1 kit error! Can't open it.").arg(name) );
+        return;
+    }
+    if( settings->session.contains(name) && mapKits.contains(name) )
+        return;
+    mapKits[name] = new Trio( this, mainWindow, name, settings );
     setConnections( name );
-    loadMAKit( name );
+    if( !loadMAKit( name ) ) {
+        deleteMAKit( name );
+        errorMessage( name, tr("Open %1 kit error! Config flash.").arg(name) );
+        return;
+    }
     mainWindow->addNewTab( name, mapKits[name]->tabKit );
     if( !settings->savedKits.contains(name) )
         settings->savedKits.append( name );
@@ -163,7 +169,7 @@ void Presenter::stopWork(const QString name)
     updateTab( name );
 }
 
-void Presenter::trainDone(const QString name)
+void Presenter::workDone(const QString name)
 {
     updateTab( name );
     //writeToConsole( name, tr("Training done!") );
@@ -220,9 +226,9 @@ void Presenter::saveSettings()
     SettingsMAS::Instance().save( settings );
 }
 
-void Presenter::loadMAKit(const QString name)
+bool Presenter::loadMAKit(const QString name)
 {
-    SettingsMAS::Instance().load( mapKits[name]->configKit );
+    return SettingsMAS::Instance().load( mapKits[name]->configKit );
 }
 
 void Presenter::saveMAKit(const QString name)
@@ -286,7 +292,7 @@ void Presenter::setConnections()
 void Presenter::setConnections(const QString name)
 {
     connect( mapKits[name]->itemMAKit, SIGNAL( trained(QString) ),
-             this, SLOT( trainDone(QString) ) );
+             this, SLOT( workDone(QString) ) );
     connect( mapKits[name]->itemMAKit, SIGNAL( progress(QString) ),
              this, SLOT( progress(QString) ) );
     connect( mapKits[name]->itemMAKit, SIGNAL( message(QString, QString) ),
@@ -296,7 +302,7 @@ void Presenter::setConnections(const QString name)
 void Presenter::deleteConnections(const QString name)
 {
     disconnect( mapKits[name]->itemMAKit, SIGNAL( trained(QString) ),
-                this, SLOT( trainDone(QString) ) );
+                this, SLOT( workDone(QString) ) );
     disconnect( mapKits[name]->itemMAKit, SIGNAL( progress(QString) ),
                 this, SLOT( progress(QString) ) );
     disconnect( mapKits[name]->itemMAKit, SIGNAL( message(QString, QString) ),
@@ -317,10 +323,11 @@ void Presenter::closeWindow()
     QApplication::exit();
 }
 
-Presenter::Trio::Trio(Presenter *parent1, MainWindow *parent2, QString name)
+Presenter::Trio::Trio(Presenter *parent1, MainWindow *parent2,
+                      QString name, Settings *sett)
 {
     configKit = new ConfigMT4( name );
-    itemMAKit = new MarketAssayKit( parent1, configKit );
+    itemMAKit = new MarketAssayKit( parent1, configKit, sett );
     tabKit = new MainWindow::KitTabWidget( parent2->getTabWidget(), name );
 }
 

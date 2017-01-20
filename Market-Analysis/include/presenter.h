@@ -21,7 +21,8 @@ private:
         ConfigMT4                   *configKit;
         MarketAssayKit              *itemMAKit;
         MainWindow::KitTabWidget    *tabKit;
-        Trio(Presenter *parent1 = 0, MainWindow *parent2 = 0, QString name = "");
+        Trio(Presenter *parent1 = 0, MainWindow *parent2 = 0,
+             QString name = "", Settings *sett = 0);
         ~Trio();
     };
     Settings                *settings;
@@ -50,14 +51,14 @@ private slots:
     void runTraining(const QString name);
     void runWork(const QString name);
     void stopWork(const QString name);
-    void trainDone(const QString name);
+    void workDone(const QString name);
     void progress(const QString name);
     void writeToConsole(const QString name, const QString text);
 
     void updateTab(const QString name);
     void loadSettings(void);
     void saveSettings(void);
-    void loadMAKit(const QString name);
+    bool loadMAKit(const QString name);
     void saveMAKit(const QString name);
     void updateActionsButtons(const QString name);
     void runTerminal(const QString name);       // ?
