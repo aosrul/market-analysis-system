@@ -17,6 +17,9 @@ private:
     ConfigMT4               *config;
     Settings                *settings;
     NN_PluginInterface      *neuralPlugin = 0;
+    bool                    stopSygnal = false;
+    qint32                  columnsDS;
+    qint32                  rowsDS;
     qint64                  firstEntryTime;
     qint64                  lastEntryTime;
 
@@ -28,9 +31,9 @@ public slots:
     void stop(void);
 
 private slots:
-    const bool loadNNPlugin();
-
-
+    void doTraining(void);
+    void doForcasting(void);
+    bool loadNNPlugin(void);
 
     void prepareDataSet(FileType historyType);
     void prepareVariablesInfo(void);
@@ -38,15 +41,14 @@ private slots:
     void prepareNeuralNetwork(void);
     void preparePerformanceFunc(void);
     void runTrainingNeuralNetwork(void);
-    void saveResultsTraining(void);
+    void saveResults(void);
     void runWorkingProcess(void);
 
     void loadHistoryFiles(QMap<QString, IMt4Reader *> &readers,
                           QMap<QString, qint32> &iters,
                           FileType historyType);
-    void loadDataToMatrixDS(const QMap<QString, IMt4Reader *> &readers,
-                            QMap<QString, qint32> &iters/*,
-                            Matrix<double> &matrixDS*/);
+    void loadDataToPlugin(const QMap<QString, IMt4Reader *> &readers,
+                  QMap<QString, qint32> &iters );
     void getFirstEntryTime(const QMap<QString, IMt4Reader *> &readers,
                            qint64 &first, qint64 &last);
     double getDoubleTimeSymbol(const QString &symbol, const qint64 &timeCurrentIter);
